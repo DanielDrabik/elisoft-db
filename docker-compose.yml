@@ -1,0 +1,35 @@
+version: '3.3'
+
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql_elisoft
+    environment:
+      SA_PASSWORD: "${SA_PASSWORD}"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    networks:
+      - tunnel
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./mssql_data:/var/opt/mssql
+      - ./backup:/var/opt/mssql/Backup
+    restart: unless-stopped
+
+  mssql-tools:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: mssql_tools
+    entrypoint: /bin/bash
+    tty: true
+    networks:
+      - tunnel
+    volumes:
+      - ./backup:/var/opt/mssql/Backup
+
+volumes:
+  mssql_data:
+
+networks:
+  tunnel:
+    external: true
